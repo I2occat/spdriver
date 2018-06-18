@@ -13,12 +13,32 @@
 
 
 /* Register Definitionen */
-#define DS3231_REG_CONTROL	0x0e
+/*          Name                address    range */
+# define DS3231_REG_SECONDS     0x00    /* 00-59            */
+# define DS3231_REG_MINUTES     0x01    /* 00-59            */
+# define DS3231_REG_HOUR        0x02    /* 1-12 +AM/PM or 00-23 */
+# define DS3231_REG_DAY         0x03    /* 1-7              */
+# define DS3231_REG_DATE        0x04    /* 01-31            */
+# define DS3231_REG_MONTHCENT   0x05    /* 01-12 + Century  */
+# define DS3231_REG_YEAR        0x06    /* 00-99            */
+# define DS3231_REG_AL1Sec      0x07    /* 00-59            */
+# define DS3231_REG_AL1MIN      0x08    /* 00-59            */
+# define DS3231_REG_AL1HR       0x09    /* 1-12 +AM/PM or 00-23 */
+# define DS3231_REG_AL1DayDate  0x0a    /* 1-7 or 1-31      */
+# define DS3231_REG_AL12MIN     0x0b    /* 0-59             */
+# define DS3231_REG_AL2HR       0x0c    /* 1-12 +AM/PM or 00-23 */
+# define DS3231_REG_AL2DayDate  0x0d    /* 1-7 or 1-31      */
+# define DS3231_REG_CONTROL	    0x0e    /* ---              */
+# define DS3231_REG_STATUS	    0x0f    /* ---              */
+# define DS3231_REG_AGING_OF    0x10    /* ---              */
+# define DS3231_REG_MSB_TEMP    0x11    /* ---              */
+# define DS3231_REG_LSB_TEMP    0x12    /* ---              */
+
+/* Bit Definitionen */
 # define DS3231_BIT_nEOSC	0x80
 # define DS3231_BIT_INTCN	0x04
 # define DS3231_BIT_A2IE	0x02
 # define DS3231_BIT_A1IE	0x01
-#define DS3231_REG_STATUS	0x0f
 # define DS3231_BIT_OSF		0x80
 
 
