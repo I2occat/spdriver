@@ -13,103 +13,14 @@
 
 
 /* Register Definitionen */
-/*          Name                address    range */
-# define DS3231_REG_SECONDS     0x00    /* 00-59            */
-# define DS3231_REG_MINUTES     0x01    /* 00-59            */
-# define DS3231_REG_HOUR        0x02    /* 1-12 +AM/PM or 00-23 */
-# define DS3231_REG_DAY         0x03    /* 1-7              */
-# define DS3231_REG_DATE        0x04    /* 01-31            */
-# define DS3231_REG_MONTHCENT   0x05    /* 01-12 + Century  */
-# define DS3231_REG_YEAR        0x06    /* 00-99            */
-# define DS3231_REG_AL1Sec      0x07    /* 00-59            */
-# define DS3231_REG_AL1MIN      0x08    /* 00-59            */
-# define DS3231_REG_AL1HR       0x09    /* 1-12 +AM/PM or 00-23 */
-# define DS3231_REG_AL1DayDate  0x0a    /* 1-7 or 1-31      */
-# define DS3231_REG_AL12MIN     0x0b    /* 0-59             */
-# define DS3231_REG_AL2HR       0x0c    /* 1-12 +AM/PM or 00-23 */
-# define DS3231_REG_AL2DayDate  0x0d    /* 1-7 or 1-31      */
-# define DS3231_REG_CONTROL	    0x0e    /* ---              */
-# define DS3231_REG_STATUS	    0x0f    /* ---              */
-# define DS3231_REG_AGING_OF    0x10    /* ---              */
-# define DS3231_REG_MSB_TEMP    0x11    /* ---              */
-# define DS3231_REG_LSB_TEMP    0x12    /* ---              */
-
-/* Bit Definitionen */
+#define DS3231_REG_CONTROL	0x0e
 # define DS3231_BIT_nEOSC	0x80
 # define DS3231_BIT_INTCN	0x04
 # define DS3231_BIT_A2IE	0x02
 # define DS3231_BIT_A1IE	0x01
+#define DS3231_REG_STATUS	0x0f
 # define DS3231_BIT_OSF		0x80
 
-
-
-
-static ssize_t ds3231_read(
-        struct  file  *file,
-        char  __user  *puffer,
-        size_t bytes,
-        loff_t *offset)
-{
-    //count = copy_to_user(puffer, string, N);
-    return 0;//N-count;
-}
-static ssize_t ds3231_write(
-        struct  file  *file,
-        const char  __user  *puffer,
-        size_t bytes,
-        loff_t *offset)
-{
-  //copy_from_user(string, puffer, bytes);
-  return 0;
-}
-static int ds3231_open(
-    struct inode *inode,    // enthält den „inode“-Eintrag der zugehörigen Gerätedatei
-    struct file *file)      // enthält Informationen über den Aufrufer und die Art des Aufrufs
-{
-    return 0;
-}
-static int ds3231_close(
-    struct inode *inode,    // enthält den „inode“-Eintrag der zugehörigen Gerätedatei
-    struct file *file)      // enthält Informationen über den Aufrufer und die Art des Aufrufs
-{
-    return 0;
-}
-
-
-static struct file_operations fops = {
-
-      .owner          = THIS_MODULE,
-      .llseek         = no_llseek,
-      .read           = ds3231_read,
-      .write          = ds3231_write,
-      .open           = ds3231_open,
-      .release        = ds3231_close,
-};
-
-
-static int device_file_major_number = 0;
-/*
- * Laden des Treibers.
- *
- */
-static int register_device(void)
-{
-	int result = 0;
-
-      printk( KERN_NOTICE "ds3231_drv: register_device() is called." );
-
-      result = register_chrdev( 0, "ds3231_drv", &fops );
-      if( result < 0 )
-      {
-         printk( KERN_WARNING "ds3231_drv:  can\'t register character device with errorcode = %i", result );
-         return result;
-      }
-
-      device_file_major_number = result;
-      printk( KERN_NOTICE "ds3231_drv: registered character device with major number = %i and minor numbers 0...255"
-                  , device_file_major_number );
-	return result;
-}
 
 /*
  * Der Zeiger wird bei Initialisierung gesetzt und wird für die
@@ -126,7 +37,7 @@ static struct i2c_client *ds3231_client;
  * wird der Treiber und das Device initialisiert.
  */
 static int ds3231_probe(struct i2c_client *client, const struct i2c_device_id *id)
-{
+{	
 	s32 reg0, reg1;
 	u8 reg_cnt, reg_sts;
 
@@ -145,7 +56,7 @@ static int ds3231_probe(struct i2c_client *client, const struct i2c_device_id *i
 	reg_sts = (u8)reg1;
 	printk("DS3231_drv: Control: 0x%02X, Status: 0x%02X\n", reg_cnt, reg_sts);
 
-	/*
+	/* 
 	 * Prüfen ob der Oscilattor abgeschaltet ist, falls ja, muss dieser
 	 * eingeschltet werden (damit die Zeit läuft).
 	 */
@@ -215,9 +126,10 @@ static struct i2c_driver ds3231_driver = {
 	.remove	  = ds3231_remove,
 };
 
+
 /*
  * Initialisierungsroutine des Kernel-Modules.
- *
+ * 
  * Wird beim Laden des Moduls aufgerufen. Innerhalb der Funktion
  * wird das neue Device (DS3231) registriert und der I2C Treiber
  * hinzugefügt.
@@ -262,11 +174,6 @@ static int __init ds3231_module_init(void)
 		i2c_unregister_device(ds3231_client);
 		ds3231_client = NULL;
 	}
-
-
-	printk("DS3231_drv: register device\n");
-	register_device();
-
 	return ret;
 }
 module_init(ds3231_module_init);
@@ -274,7 +181,7 @@ module_init(ds3231_module_init);
 
 /*
  * Aufräumroutine des Kernel-Modules.
- *
+ * 
  * Wird beim Enladen des Moduls aufgerufen. Innerhalb der Funktion
  * werden alle Resourcen wieder freigegeben.
  */
@@ -285,8 +192,6 @@ static void __exit ds3231_module_exit(void)
 		i2c_del_driver(&ds3231_driver);
 		i2c_unregister_device(ds3231_client);
 	}
-	printk("DS3231_drv: Treiber entladen mit major_number: %i \n", device_file_major_number);
-	unregister_chrdev(device_file_major_number, "Treiber");
 }
 module_exit(ds3231_module_exit);
 

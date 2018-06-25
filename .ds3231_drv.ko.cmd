@@ -1,0 +1,1 @@
+cmd_/home/user06/ds3231_kai/ds3231_drv.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/user06/ds3231_kai/ds3231_drv.ko /home/user06/ds3231_kai/ds3231_drv.o /home/user06/ds3231_kai/ds3231_drv.mod.o ;  true
